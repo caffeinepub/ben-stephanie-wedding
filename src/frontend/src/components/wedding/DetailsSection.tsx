@@ -12,22 +12,22 @@ const detailItems = [
   {
     icon: Calendar,
     label: "Date",
-    key: "date" as keyof WeddingDetails,
+    value: "12th August 2026",
   },
   {
     icon: Clock,
     label: "Time",
-    key: "time" as keyof WeddingDetails,
+    value: "From 7PM",
   },
   {
     icon: MapPin,
     label: "Venue",
-    key: "venue" as keyof WeddingDetails,
+    value: "Civvy",
   },
   {
     icon: MapPinned,
     label: "Address",
-    key: "address" as keyof WeddingDetails,
+    value: "11 St Leonard's Bank, Perth PH2 8EB",
   },
 ];
 
@@ -53,7 +53,7 @@ export function DetailsSection({ details, isLoading }: DetailsSectionProps) {
   return (
     <section
       data-ocid="details.section"
-      className="py-24 md:py-32 px-6 relative overflow-hidden"
+      className="pt-24 md:pt-32 pb-8 md:pb-12 px-6 relative overflow-hidden"
       style={{
         background: `
           linear-gradient(180deg, oklch(var(--cream)) 0%, oklch(var(--cream-dark)) 100%)
@@ -308,7 +308,7 @@ export function DetailsSection({ details, isLoading }: DetailsSectionProps) {
             The Details
           </p>
           <h2 className="font-display text-4xl md:text-6xl font-[300] text-foreground mb-6">
-            Ceremony &amp; Celebration
+            Evening Celebration
           </h2>
           <div className="flex items-center justify-center gap-4">
             <div className="w-16 h-[1px] bg-sage/40" />
@@ -316,13 +316,17 @@ export function DetailsSection({ details, isLoading }: DetailsSectionProps) {
             <div className="w-16 h-[1px] bg-sage/40" />
           </div>
 
+          <p className="font-body-serif text-base md:text-lg text-muted-foreground mt-6 max-w-xl mx-auto leading-relaxed italic">
+            You are warmly invited to join us for the evening celebration.
+          </p>
+
           {isLoading ? (
-            <div className="mt-8 flex flex-col items-center gap-2">
+            <div className="mt-6 flex flex-col items-center gap-2">
               <Skeleton className="h-4 w-72 bg-sage/10" />
               <Skeleton className="h-4 w-60 bg-sage/10" />
             </div>
           ) : details?.description ? (
-            <p className="font-body-serif text-lg md:text-xl text-muted-foreground mt-8 max-w-2xl mx-auto leading-relaxed italic">
+            <p className="font-body-serif text-lg md:text-xl text-muted-foreground mt-6 max-w-2xl mx-auto leading-relaxed italic">
               {details.description}
             </p>
           ) : null}
@@ -336,9 +340,9 @@ export function DetailsSection({ details, isLoading }: DetailsSectionProps) {
           viewport={{ once: true }}
           className="grid grid-cols-1 sm:grid-cols-2 gap-6"
         >
-          {detailItems.map(({ icon: Icon, label, key }) => (
+          {detailItems.map(({ icon: Icon, label, value }) => (
             <motion.div
-              key={key}
+              key={label}
               variants={itemVariants}
               className="group relative bg-white/70 backdrop-blur-sm border border-sage/20 rounded-2xl p-7 shadow-card hover:shadow-card-hover transition-all duration-300 overflow-hidden"
             >
@@ -353,13 +357,9 @@ export function DetailsSection({ details, isLoading }: DetailsSectionProps) {
                   <p className="font-sans text-xs font-semibold tracking-widest uppercase text-sage mb-1">
                     {label}
                   </p>
-                  {isLoading ? (
-                    <Skeleton className="h-6 w-40 bg-sage/10" />
-                  ) : (
-                    <p className="font-display text-xl font-[400] text-foreground">
-                      {details?.[key] || "—"}
-                    </p>
-                  )}
+                  <p className="font-display text-xl font-[400] text-foreground">
+                    {value}
+                  </p>
                 </div>
               </div>
             </motion.div>

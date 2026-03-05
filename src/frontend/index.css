@@ -42,20 +42,20 @@
 
     /* Wedding palette:
        sage green  = oklch(0.87 0.04 130)  → #d6ddb9 (user-requested)
-       cream/ivory = oklch(0.96 0.02 90)   → #F9F4EC-ish
+       cream/ivory = oklch(0.98 0.012 90)  → lighter cream
        sunflower   = oklch(0.82 0.18 85)   → #F5C842-ish
        dark sage   = oklch(0.55 0.06 130)
        warm brown  = oklch(0.4 0.05 60)
     */
 
     /* Semantic tokens */
-    --background: 0.96 0.018 90;
+    --background: 0.98 0.012 90;
     --foreground: 0.28 0.04 60;
 
-    --card: 0.98 0.01 80;
+    --card: 0.99 0.006 80;
     --card-foreground: 0.28 0.04 60;
 
-    --popover: 0.98 0.01 80;
+    --popover: 0.99 0.006 80;
     --popover-foreground: 0.28 0.04 60;
 
     --primary: 0.55 0.06 130;
@@ -81,8 +81,8 @@
     --sage: 0.87 0.04 130;
     --sage-light: 0.92 0.03 130;
     --sage-dark: 0.55 0.06 130;
-    --cream: 0.96 0.018 90;
-    --cream-dark: 0.91 0.03 85;
+    --cream: 0.98 0.012 90;
+    --cream-dark: 0.93 0.02 85;
     --sunflower: 0.82 0.18 85;
     --sunflower-dark: 0.72 0.18 75;
     --warm-brown: 0.4 0.05 60;
@@ -96,7 +96,7 @@
     --chart-5: 0.72 0.18 75;
 
     /* Sidebar */
-    --sidebar: 0.96 0.018 90;
+    --sidebar: 0.98 0.012 90;
     --sidebar-foreground: 0.28 0.04 60;
     --sidebar-primary: 0.55 0.06 130;
     --sidebar-primary-foreground: 0.98 0.01 80;

@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -335,49 +334,12 @@ export function AdminPanel({ storageClient, onLogout }: AdminPanelProps) {
 
             {detailsLoading ? (
               <div className="space-y-4">
-                {["f1", "f2", "f3", "f4", "f5"].map((id) => (
+                {["f1", "f2"].map((id) => (
                   <Skeleton key={id} className="h-10 w-full bg-sage/10" />
                 ))}
               </div>
             ) : (
               <form onSubmit={handleDetailsSave} className="space-y-4">
-                {(
-                  [
-                    {
-                      key: "date",
-                      label: "Date",
-                      placeholder: "e.g. June 14, 2025",
-                    },
-                    { key: "time", label: "Time", placeholder: "e.g. 4:00 PM" },
-                    {
-                      key: "venue",
-                      label: "Venue",
-                      placeholder: "e.g. The Garden Estate",
-                    },
-                    {
-                      key: "address",
-                      label: "Address",
-                      placeholder: "Street, City, State ZIP",
-                    },
-                  ] as const
-                ).map(({ key, label, placeholder }) => (
-                  <div key={key} className="space-y-1.5">
-                    <Label
-                      htmlFor={`details-${key}`}
-                      className="font-sans text-xs font-semibold tracking-widest uppercase text-foreground/60"
-                    >
-                      {label}
-                    </Label>
-                    <Input
-                      id={`details-${key}`}
-                      value={currentDetails[key]}
-                      onChange={(e) => handleDetailsChange(key, e.target.value)}
-                      placeholder={placeholder}
-                      className="border-sage/30 focus-visible:ring-sage bg-white/60 rounded-xl font-sans"
-                    />
-                  </div>
-                ))}
-
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="details-description"

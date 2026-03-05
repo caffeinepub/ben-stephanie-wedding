@@ -1,53 +1,52 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { CheckCircle2, Heart, Loader2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useSubmitRSVP } from "../../hooks/useQueries";
 
 export function RSVPSection() {
-  const [guestName, setGuestName] = useState("");
-  const [partySize, setPartySize] = useState("1");
+  const [partySize, setPartySize] = useState(1);
+  const [guestNames, setGuestNames] = useState<string[]>([""]);
   const [attending, setAttending] = useState<"yes" | "no" | "">("");
-  const [mealPreference, setMealPreference] = useState("");
   const [message, setMessage] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   const { mutate: submitRSVP, isPending } = useSubmitRSVP();
 
+  // Keep guestNames array in sync with partySize
+  useEffect(() => {
+    setGuestNames((prev) => {
+      const next = [...prev];
+      while (next.length < partySize) next.push("");
+      return next.slice(0, partySize);
+    });
+  }, [partySize]);
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (!guestName.trim()) {
-      toast.error("Please enter your name.");
+    if (guestNames.some((n) => !n.trim())) {
+      toast.error("Please enter a name for every guest.");
       return;
     }
     if (!attending) {
       toast.error("Please let us know if you'll be attending.");
       return;
     }
-    if (attending === "yes" && !mealPreference) {
-      toast.error("Please select a meal preference.");
-      return;
-    }
+
+    const combinedName = guestNames.map((n) => n.trim()).join(", ");
 
     submitRSVP(
       {
-        guestName: guestName.trim(),
+        guestName: combinedName,
         partySize: BigInt(partySize),
         attending: attending === "yes",
-        mealPreference: attending === "no" ? "N/A" : mealPreference,
+        mealPreference: "N/A",
         message: message.trim(),
       },
       {
@@ -61,10 +60,18 @@ export function RSVPSection() {
     );
   }
 
+  function resetForm() {
+    setSubmitted(false);
+    setPartySize(1);
+    setGuestNames([""]);
+    setAttending("");
+    setMessage("");
+  }
+
   return (
     <section
       data-ocid="rsvp.section"
-      className="py-24 md:py-32 px-6 relative overflow-hidden"
+      className="pt-8 md:pt-12 pb-24 md:pb-32 px-6 relative overflow-hidden"
       style={{
         background: `
           linear-gradient(180deg, oklch(var(--cream-dark)) 0%, oklch(var(--cream)) 50%, oklch(var(--cream-dark)) 100%)
@@ -104,7 +111,7 @@ export function RSVPSection() {
             <div className="w-12 h-[1px] bg-sage/40" />
           </div>
           <p className="font-body-serif text-lg text-muted-foreground italic">
-            Please respond by May 1st, 2025
+            Please respond by July 10th, 2026
           </p>
         </motion.div>
 
@@ -141,14 +148,7 @@ export function RSVPSection() {
               <Button
                 variant="outline"
                 className="border-sage/40 text-sage hover:bg-sage/10 font-sans rounded-full px-8"
-                onClick={() => {
-                  setSubmitted(false);
-                  setGuestName("");
-                  setPartySize("1");
-                  setAttending("");
-                  setMealPreference("");
-                  setMessage("");
-                }}
+                onClick={resetForm}
               >
                 Submit Another RSVP
               </Button>
@@ -163,26 +163,6 @@ export function RSVPSection() {
               className="bg-white/80 backdrop-blur-sm border border-sage/20 rounded-3xl p-8 md:p-10 shadow-petal"
             >
               <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-                {/* Guest name */}
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="guest-name"
-                    className="font-sans text-sm font-semibold tracking-wide text-foreground/70 uppercase"
-                  >
-                    Your Name
-                  </Label>
-                  <Input
-                    id="guest-name"
-                    data-ocid="rsvp.guest_name.input"
-                    placeholder="Enter your full name"
-                    value={guestName}
-                    onChange={(e) => setGuestName(e.target.value)}
-                    className="border-sage/30 focus-visible:ring-sage bg-white/60 rounded-xl h-12 font-sans text-base placeholder:text-muted-foreground/50"
-                    autoComplete="name"
-                    required
-                  />
-                </div>
-
                 {/* Attending toggle */}
                 <div className="space-y-2">
                   <Label className="font-sans text-sm font-semibold tracking-wide text-foreground/70 uppercase">
@@ -212,7 +192,7 @@ export function RSVPSection() {
                   </ToggleGroup>
                 </div>
 
-                {/* Party size */}
+                {/* Number of guests */}
                 <div className="space-y-2">
                   <Label
                     htmlFor="party-size"
@@ -227,52 +207,57 @@ export function RSVPSection() {
                     min={1}
                     max={10}
                     value={partySize}
-                    onChange={(e) => setPartySize(e.target.value)}
+                    onChange={(e) =>
+                      setPartySize(
+                        Math.max(1, Math.min(10, Number(e.target.value))),
+                      )
+                    }
                     className="border-sage/30 focus-visible:ring-sage bg-white/60 rounded-xl h-12 font-sans text-base w-32"
                   />
                 </div>
 
-                {/* Meal preference */}
+                {/* Per-guest name fields */}
                 <AnimatePresence>
-                  {attending === "yes" && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="space-y-2 overflow-hidden"
-                    >
-                      <Label
-                        htmlFor="meal-preference"
-                        className="font-sans text-sm font-semibold tracking-wide text-foreground/70 uppercase"
+                  <motion.div layout className="flex flex-col gap-3">
+                    {guestNames.map((name, index) => (
+                      <motion.div
+                        // biome-ignore lint/suspicious/noArrayIndexKey: guest slot index is stable and positional
+                        key={index}
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.25 }}
+                        className="space-y-1 overflow-hidden"
                       >
-                        Meal Preference
-                      </Label>
-                      <Select
-                        value={mealPreference}
-                        onValueChange={setMealPreference}
-                      >
-                        <SelectTrigger
-                          id="meal-preference"
-                          data-ocid="rsvp.meal.select"
-                          className="border-sage/30 focus:ring-sage bg-white/60 rounded-xl h-12 font-sans text-base"
+                        <Label
+                          htmlFor={`guest-name-${index}`}
+                          className="font-sans text-sm font-semibold tracking-wide text-foreground/70 uppercase"
                         >
-                          <SelectValue placeholder="Select your meal" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Chicken" className="font-sans">
-                            Chicken
-                          </SelectItem>
-                          <SelectItem value="Fish" className="font-sans">
-                            Fish
-                          </SelectItem>
-                          <SelectItem value="Vegetarian" className="font-sans">
-                            Vegetarian
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </motion.div>
-                  )}
+                          {partySize === 1
+                            ? "Your Name"
+                            : `Guest ${index + 1} Name`}
+                        </Label>
+                        <Input
+                          id={`guest-name-${index}`}
+                          data-ocid={`rsvp.guest_name.input.${index + 1}`}
+                          placeholder={
+                            index === 0
+                              ? "Enter full name"
+                              : `Enter guest ${index + 1} full name`
+                          }
+                          value={name}
+                          onChange={(e) => {
+                            const updated = [...guestNames];
+                            updated[index] = e.target.value;
+                            setGuestNames(updated);
+                          }}
+                          className="border-sage/30 focus-visible:ring-sage bg-white/60 rounded-xl h-12 font-sans text-base placeholder:text-muted-foreground/50"
+                          autoComplete={index === 0 ? "name" : "off"}
+                          required
+                        />
+                      </motion.div>
+                    ))}
+                  </motion.div>
                 </AnimatePresence>
 
                 {/* Message */}

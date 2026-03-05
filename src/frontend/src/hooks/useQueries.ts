@@ -11,12 +11,12 @@ export function useWeddingDetails() {
     queryFn: async () => {
       if (!actor) {
         return {
-          venue: "The Garden Estate",
-          date: "June 14, 2025",
-          time: "4:00 PM",
+          venue: "Civvy",
+          date: "12th August 2026",
+          time: "From 7PM",
           description:
-            "Join us for an intimate garden ceremony surrounded by blooming flowers and loved ones. We can't wait to celebrate this milestone with you.",
-          address: "1247 Rose Meadow Lane, Sonoma, CA 95476",
+            "Join us at the Civvy to celebrate us becoming Mr and Mrs Mitchell.",
+          address: "11 St Leonard's Bank, Perth PH2 8EB",
         };
       }
       return actor.getWeddingDetails();
