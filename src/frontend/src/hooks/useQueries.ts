@@ -1,18 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { RSVP, WeddingDetails } from "../backend.d";
+import { createActorWithConfig } from "../config";
 import { useActor } from "./useActor";
 
 // ─── Wedding Details ─────────────────────────────────────────────────────────
 
 export function useWeddingDetails() {
-  const { actor, isFetching } = useActor();
+  const { actor } = useActor();
   return useQuery<WeddingDetails>({
     queryKey: ["weddingDetails"],
     queryFn: async () => {
       if (!actor) {
         return {
           venue: "Civvy",
-          date: "12th August 2026",
+          date: "21st August 2026",
           time: "From 7PM",
           description:
             "Join us at the Civvy to celebrate us becoming Mr and Mrs Mitchell.",
@@ -21,7 +22,8 @@ export function useWeddingDetails() {
       }
       return actor.getWeddingDetails();
     },
-    enabled: !isFetching,
+    // Run as soon as we have an actor; no need to wait on isFetching
+    enabled: !!actor,
   });
 }
 
@@ -48,14 +50,15 @@ export function useUpdateWeddingDetails() {
 // ─── RSVP ────────────────────────────────────────────────────────────────────
 
 export function useAllRSVPs() {
-  const { actor, isFetching } = useActor();
+  const { actor } = useActor();
   return useQuery<RSVP[]>({
     queryKey: ["allRSVPs"],
     queryFn: async () => {
       if (!actor) return [];
       return actor.getAllRSVPs();
     },
-    enabled: !!actor && !isFetching,
+    // actor being non-null already means the actor query settled successfully
+    enabled: !!actor,
   });
 }
 
@@ -68,12 +71,15 @@ export interface SubmitRSVPParams {
 }
 
 export function useSubmitRSVP() {
-  const { actor } = useActor();
   const queryClient = useQueryClient();
-  return useMutation({
+  const { actor } = useActor();
+
+  const mutation = useMutation({
     mutationFn: async (params: SubmitRSVPParams) => {
-      if (!actor) throw new Error("Could not connect to backend");
-      return actor.submitRSVP(
+      // Use the cached actor if available, otherwise create a fresh anonymous
+      // actor. This ensures submission never gets blocked by loading state.
+      const resolvedActor = actor ?? (await createActorWithConfig());
+      return resolvedActor.submitRSVP(
         params.guestName,
         params.partySize,
         params.attending,
@@ -85,6 +91,8 @@ export function useSubmitRSVP() {
       queryClient.invalidateQueries({ queryKey: ["allRSVPs"] });
     },
   });
+
+  return { ...mutation, isPending: mutation.isPending };
 }
 
 export function useDeleteRSVP() {
@@ -104,13 +112,13 @@ export function useDeleteRSVP() {
 // ─── Admin ───────────────────────────────────────────────────────────────────
 
 export function useIsAdmin() {
-  const { actor, isFetching } = useActor();
+  const { actor } = useActor();
   return useQuery<boolean>({
     queryKey: ["isAdmin"],
     queryFn: async () => {
       if (!actor) return false;
       return actor.isCallerAdmin();
     },
-    enabled: !!actor && !isFetching,
+    enabled: !!actor,
   });
 }

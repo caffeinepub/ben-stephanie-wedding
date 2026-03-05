@@ -181,13 +181,13 @@ export function RSVPSection() {
                       value="yes"
                       className="rounded-full px-6 h-11 border border-sage/30 data-[state=on]:bg-sage data-[state=on]:text-white data-[state=on]:border-sage font-sans font-medium"
                     >
-                      Joyfully accepts
+                      Yes I will be there
                     </ToggleGroupItem>
                     <ToggleGroupItem
                       value="no"
                       className="rounded-full px-6 h-11 border border-sage/30 data-[state=on]:bg-warm-brown data-[state=on]:text-white data-[state=on]:border-warm-brown font-sans font-medium"
                     >
-                      Regretfully declines
+                      Sorry I can't make it
                     </ToggleGroupItem>
                   </ToggleGroup>
                 </div>

@@ -12,7 +12,7 @@ const detailItems = [
   {
     icon: Calendar,
     label: "Date",
-    value: "12th August 2026",
+    value: "21st August 2026",
   },
   {
     icon: Clock,
