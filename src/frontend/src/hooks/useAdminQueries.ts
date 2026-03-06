@@ -1,34 +1,37 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { RSVP } from "../backend.d";
-import { useActor } from "./useActor";
+import { createActorWithConfig } from "../config";
+import { getSecretParameter } from "../utils/urlParams";
 
 /**
- * Fetches all RSVPs using the shared actor from useActor.
- * useActor already handles _initializeAccessControlWithSecret, so no
- * duplicate actor setup is needed here.
+ * Fetches all RSVPs using a freshly-created admin-privileged actor.
+ * Creates its own actor directly so there's no chicken-and-egg dependency.
  */
 export function useAdminRSVPs() {
-  const { actor } = useActor();
-
   return useQuery<RSVP[]>({
     queryKey: ["adminRSVPs"],
     queryFn: async () => {
-      if (!actor) return [];
+      const actor = (await createActorWithConfig()) as any;
+      const token = getSecretParameter("caffeineAdminToken") ?? "";
+      await actor._initializeAccessControlWithSecret(token);
       return actor.getAllRSVPs();
     },
+    retry: 2,
+    retryDelay: 1000,
   });
 }
 
 /**
- * Deletes an RSVP by ID using the shared actor.
+ * Deletes an RSVP by ID using a freshly-created admin-privileged actor.
  */
 export function useAdminDeleteRSVP() {
-  const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (id: bigint) => {
-      if (!actor) throw new Error("Backend not ready. Please try again.");
+      const actor = (await createActorWithConfig()) as any;
+      const token = getSecretParameter("caffeineAdminToken") ?? "";
+      await actor._initializeAccessControlWithSecret(token);
       await actor.deleteRSVP(id);
     },
     onSuccess: () => {

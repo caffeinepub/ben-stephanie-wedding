@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { RSVP, WeddingDetails } from "../backend.d";
+import { createActorWithConfig } from "../config";
 import { useActor } from "./useActor";
 
 // ─── Wedding Details ─────────────────────────────────────────────────────────
@@ -69,11 +70,10 @@ export interface SubmitRSVPParams {
 
 export function useSubmitRSVP() {
   const queryClient = useQueryClient();
-  const { actor } = useActor();
 
   return useMutation({
     mutationFn: async (params: SubmitRSVPParams) => {
-      if (!actor) throw new Error("Please try again in a moment.");
+      const actor = await createActorWithConfig();
       return actor.submitRSVP(
         params.guestName,
         params.partySize,

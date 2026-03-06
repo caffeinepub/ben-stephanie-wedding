@@ -141,7 +141,7 @@ export function FooterSection() {
           Ben &amp; Stephanie
         </p>
         <p className="font-sans text-xs text-muted-foreground tracking-widest uppercase mb-6">
-          Forever begins · June 14, 2025
+          Forever begins · 21st August 2026
         </p>
         <div className="w-16 h-[1px] bg-sage/30 mx-auto mb-6" />
         <p className="font-sans text-xs text-muted-foreground">
