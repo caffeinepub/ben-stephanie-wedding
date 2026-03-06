@@ -102,9 +102,6 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
                     Attending
                   </TableHead>
                   <TableHead className="font-sans text-xs tracking-widest uppercase text-muted-foreground">
-                    Meal
-                  </TableHead>
-                  <TableHead className="font-sans text-xs tracking-widest uppercase text-muted-foreground">
                     Message
                   </TableHead>
                   <TableHead className="font-sans text-xs tracking-widest uppercase text-muted-foreground">
@@ -117,18 +114,16 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
                 {rsvpsLoading ? (
                   ["r1", "r2", "r3"].map((rowId) => (
                     <TableRow key={rowId} className="border-sage/10">
-                      {["c1", "c2", "c3", "c4", "c5", "c6", "c7"].map(
-                        (colId) => (
-                          <TableCell key={colId}>
-                            <Skeleton className="h-4 w-full bg-sage/10" />
-                          </TableCell>
-                        ),
-                      )}
+                      {["c1", "c2", "c3", "c4", "c5", "c6"].map((colId) => (
+                        <TableCell key={colId}>
+                          <Skeleton className="h-4 w-full bg-sage/10" />
+                        </TableCell>
+                      ))}
                     </TableRow>
                   ))
                 ) : !rsvps || rsvps.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7}>
+                    <TableCell colSpan={6}>
                       <div
                         data-ocid="admin.rsvp.empty_state"
                         className="text-center py-12"
@@ -163,9 +158,6 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
                         >
                           {rsvp.attending ? "Yes" : "No"}
                         </Badge>
-                      </TableCell>
-                      <TableCell className="font-sans text-muted-foreground">
-                        {rsvp.mealPreference}
                       </TableCell>
                       <TableCell className="font-sans text-muted-foreground max-w-[200px] truncate">
                         {rsvp.message || "—"}
