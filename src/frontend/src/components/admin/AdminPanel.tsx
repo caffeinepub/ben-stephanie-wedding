@@ -23,15 +23,15 @@ import {
 import { Loader2, LogOut, Trash2 } from "lucide-react";
 import { motion } from "motion/react";
 import { toast } from "sonner";
-import { useAllRSVPs, useDeleteRSVP } from "../../hooks/useQueries";
+import { useAdminDeleteRSVP, useAdminRSVPs } from "../../hooks/useAdminQueries";
 
 interface AdminPanelProps {
   onLogout?: () => void;
 }
 
 export function AdminPanel({ onLogout }: AdminPanelProps) {
-  const { data: rsvps, isLoading: rsvpsLoading } = useAllRSVPs();
-  const { mutate: deleteRSVP, isPending: deletingId } = useDeleteRSVP();
+  const { data: rsvps, isLoading: rsvpsLoading } = useAdminRSVPs();
+  const { mutate: deleteRSVP, isPending: deletingId } = useAdminDeleteRSVP();
 
   function formatDate(submittedAt: bigint) {
     const ms = Number(submittedAt) / 1_000_000;

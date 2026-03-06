@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { RSVP, WeddingDetails } from "../backend.d";
-import { createActorWithConfig } from "../config";
 import { useActor } from "./useActor";
 
 // ─── Wedding Details ─────────────────────────────────────────────────────────
@@ -57,8 +56,6 @@ export function useAllRSVPs() {
       if (!actor) return [];
       return actor.getAllRSVPs();
     },
-    // actor being non-null already means the actor query settled successfully
-    enabled: !!actor,
   });
 }
 
@@ -74,12 +71,10 @@ export function useSubmitRSVP() {
   const queryClient = useQueryClient();
   const { actor } = useActor();
 
-  const mutation = useMutation({
+  return useMutation({
     mutationFn: async (params: SubmitRSVPParams) => {
-      // Use the cached actor if available, otherwise create a fresh anonymous
-      // actor. This ensures submission never gets blocked by loading state.
-      const resolvedActor = actor ?? (await createActorWithConfig());
-      return resolvedActor.submitRSVP(
+      if (!actor) throw new Error("Please try again in a moment.");
+      return actor.submitRSVP(
         params.guestName,
         params.partySize,
         params.attending,
@@ -91,8 +86,6 @@ export function useSubmitRSVP() {
       queryClient.invalidateQueries({ queryKey: ["allRSVPs"] });
     },
   });
-
-  return { ...mutation, isPending: mutation.isPending };
 }
 
 export function useDeleteRSVP() {
