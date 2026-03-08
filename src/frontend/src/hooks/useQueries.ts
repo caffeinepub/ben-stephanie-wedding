@@ -1,38 +1,35 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { RSVP, WeddingDetails } from "../backend.d";
 import { createActorWithConfig } from "../config";
-import { useActor } from "./useActor";
+import { getSecretParameter } from "../utils/urlParams";
 
 // ─── Wedding Details ─────────────────────────────────────────────────────────
 
 export function useWeddingDetails() {
-  const { actor } = useActor();
   return useQuery<WeddingDetails>({
     queryKey: ["weddingDetails"],
     queryFn: async () => {
-      if (!actor) {
-        return {
-          venue: "Civvy",
-          date: "21st August 2026",
-          time: "From 7PM",
-          description:
-            "Join us at the Civvy to celebrate us becoming Mr and Mrs Mitchell.",
-          address: "11 St Leonard's Bank, Perth PH2 8EB",
-        };
-      }
+      const actor = await createActorWithConfig();
       return actor.getWeddingDetails();
     },
-    // Run as soon as we have an actor; no need to wait on isFetching
-    enabled: !!actor,
+    // Fallback to static values if backend fails
+    placeholderData: {
+      venue: "Civvy",
+      date: "21st August 2026",
+      time: "From 7PM",
+      description:
+        "Join us at the Civvy to celebrate us becoming Mr and Mrs Mitchell.",
+      address: "11 St Leonard's Bank, Perth PH2 8EB",
+    },
+    retry: 2,
   });
 }
 
 export function useUpdateWeddingDetails() {
-  const { actor } = useActor();
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (details: WeddingDetails) => {
-      if (!actor) throw new Error("Not authenticated");
+      const actor = await createActorWithConfig();
       await actor.updateWeddingDetails(
         details.date,
         details.time,
@@ -48,17 +45,6 @@ export function useUpdateWeddingDetails() {
 }
 
 // ─── RSVP ────────────────────────────────────────────────────────────────────
-
-export function useAllRSVPs() {
-  const { actor } = useActor();
-  return useQuery<RSVP[]>({
-    queryKey: ["allRSVPs"],
-    queryFn: async () => {
-      if (!actor) return [];
-      return actor.getAllRSVPs();
-    },
-  });
-}
 
 export interface SubmitRSVPParams {
   guestName: string;
@@ -83,35 +69,42 @@ export function useSubmitRSVP() {
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["allRSVPs"] });
-    },
-  });
-}
-
-export function useDeleteRSVP() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (id: bigint) => {
-      if (!actor) throw new Error("Not authenticated");
-      await actor.deleteRSVP(id);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["allRSVPs"] });
+      queryClient.invalidateQueries({ queryKey: ["adminRSVPs"] });
     },
   });
 }
 
 // ─── Admin ───────────────────────────────────────────────────────────────────
 
-export function useIsAdmin() {
-  const { actor } = useActor();
-  return useQuery<boolean>({
-    queryKey: ["isAdmin"],
+async function createAdminActor() {
+  const actor = await createActorWithConfig();
+  const adminToken = getSecretParameter("caffeineAdminToken") ?? "";
+  // biome-ignore lint/suspicious/noExplicitAny: runtime method not in generated types
+  await (actor as any)._initializeAccessControlWithSecret(adminToken);
+  return actor;
+}
+
+export function useAdminRSVPs() {
+  return useQuery<RSVP[]>({
+    queryKey: ["adminRSVPs"],
     queryFn: async () => {
-      if (!actor) return false;
-      return actor.isCallerAdmin();
+      const actor = await createAdminActor();
+      return actor.getAllRSVPs();
     },
-    enabled: !!actor,
+    retry: 3,
+    retryDelay: 1500,
+  });
+}
+
+export function useAdminDeleteRSVP() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: bigint) => {
+      const actor = await createAdminActor();
+      await actor.deleteRSVP(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adminRSVPs"] });
+    },
   });
 }

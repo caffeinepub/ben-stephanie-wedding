@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useSubmitRSVP } from "../../hooks/useQueries";
 
-export function RSVPSection() {
+export function RSVPSection({ instanceId = "1" }: { instanceId?: string }) {
   const [partySize, setPartySize] = useState(1);
   const [guestNames, setGuestNames] = useState<string[]>([""]);
   const [attending, setAttending] = useState<"yes" | "no" | "">("");
@@ -70,7 +70,7 @@ export function RSVPSection() {
 
   return (
     <section
-      data-ocid="rsvp.section"
+      data-ocid={`rsvp${instanceId === "1" ? "" : instanceId}.section`}
       className="pt-8 md:pt-12 pb-24 md:pb-32 px-6 relative overflow-hidden"
       style={{
         background: `
@@ -119,7 +119,7 @@ export function RSVPSection() {
           {submitted ? (
             <motion.div
               key="success"
-              data-ocid="rsvp.success_state"
+              data-ocid={`rsvp${instanceId === "1" ? "" : instanceId}.success_state`}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
@@ -175,7 +175,7 @@ export function RSVPSection() {
                       setAttending(val as "yes" | "no" | "")
                     }
                     className="justify-start gap-3"
-                    data-ocid="rsvp.attending.toggle"
+                    data-ocid={`rsvp${instanceId === "1" ? "" : instanceId}.attending.toggle`}
                   >
                     <ToggleGroupItem
                       value="yes"
@@ -195,14 +195,14 @@ export function RSVPSection() {
                 {/* Number of guests */}
                 <div className="space-y-2">
                   <Label
-                    htmlFor="party-size"
+                    htmlFor={`party-size-${instanceId}`}
                     className="font-sans text-sm font-semibold tracking-wide text-foreground/70 uppercase"
                   >
                     Number of Guests
                   </Label>
                   <Input
-                    id="party-size"
-                    data-ocid="rsvp.party_size.input"
+                    id={`party-size-${instanceId}`}
+                    data-ocid={`rsvp${instanceId === "1" ? "" : instanceId}.party_size.input`}
                     type="number"
                     min={1}
                     max={10}
@@ -230,7 +230,7 @@ export function RSVPSection() {
                         className="space-y-1 overflow-hidden"
                       >
                         <Label
-                          htmlFor={`guest-name-${index}`}
+                          htmlFor={`guest-name-${instanceId}-${index}`}
                           className="font-sans text-sm font-semibold tracking-wide text-foreground/70 uppercase"
                         >
                           {partySize === 1
@@ -238,8 +238,8 @@ export function RSVPSection() {
                             : `Guest ${index + 1} Name`}
                         </Label>
                         <Input
-                          id={`guest-name-${index}`}
-                          data-ocid={`rsvp.guest_name.input.${index + 1}`}
+                          id={`guest-name-${instanceId}-${index}`}
+                          data-ocid={`rsvp${instanceId === "1" ? "" : instanceId}.guest_name.input.${index + 1}`}
                           placeholder={
                             index === 0
                               ? "Enter full name"
@@ -263,7 +263,7 @@ export function RSVPSection() {
                 {/* Message */}
                 <div className="space-y-2">
                   <Label
-                    htmlFor="message"
+                    htmlFor={`message-${instanceId}`}
                     className="font-sans text-sm font-semibold tracking-wide text-foreground/70 uppercase"
                   >
                     Message to the Couple
@@ -272,8 +272,8 @@ export function RSVPSection() {
                     </span>
                   </Label>
                   <Textarea
-                    id="message"
-                    data-ocid="rsvp.message.textarea"
+                    id={`message-${instanceId}`}
+                    data-ocid={`rsvp${instanceId === "1" ? "" : instanceId}.message.textarea`}
                     placeholder="Share your well wishes or a special memory..."
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
@@ -284,7 +284,7 @@ export function RSVPSection() {
                 {/* Submit */}
                 <Button
                   type="submit"
-                  data-ocid="rsvp.submit_button"
+                  data-ocid={`rsvp${instanceId === "1" ? "" : instanceId}.submit_button`}
                   disabled={isPending}
                   className="w-full h-13 rounded-full font-sans font-semibold text-base tracking-wide bg-sage hover:bg-sage-dark text-white shadow-petal mt-2 transition-all duration-300"
                   style={{ height: "52px" }}

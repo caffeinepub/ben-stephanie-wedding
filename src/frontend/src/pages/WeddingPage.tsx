@@ -11,7 +11,8 @@ export function WeddingPage() {
     <main className="min-h-screen">
       <HeroSection />
       <DetailsSection details={details} isLoading={isLoading} />
-      <RSVPSection />
+      <RSVPSection instanceId="1" />
+      <RSVPSection instanceId="2" />
       <FooterSection />
     </main>
   );
