@@ -20,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Loader2, LogOut, Trash2 } from "lucide-react";
+import { Loader2, LogOut, RefreshCw, Trash2 } from "lucide-react";
 import { motion } from "motion/react";
 import { toast } from "sonner";
 import { useAdminDeleteRSVP, useAdminRSVPs } from "../../hooks/useAdminQueries";
@@ -30,7 +30,12 @@ interface AdminPanelProps {
 }
 
 export function AdminPanel({ onLogout }: AdminPanelProps) {
-  const { data: rsvps, isLoading: rsvpsLoading } = useAdminRSVPs();
+  const {
+    data: rsvps,
+    isLoading: rsvpsLoading,
+    refetch: refetchRSVPs,
+    isFetching: rsvpsFetching,
+  } = useAdminRSVPs();
   const { mutate: deleteRSVP, isPending: deletingId } = useAdminDeleteRSVP();
 
   function formatDate(submittedAt: bigint) {
@@ -77,15 +82,29 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
           transition={{ duration: 0.5 }}
           className="bg-white/80 backdrop-blur-sm border border-sage/20 rounded-2xl overflow-hidden shadow-card"
         >
-          <div className="px-6 py-5 border-b border-sage/10">
-            <h2 className="font-display text-2xl font-[300] text-foreground">
-              Guest RSVPs
-            </h2>
-            <p className="font-sans text-sm text-muted-foreground mt-0.5">
-              {rsvps
-                ? `${rsvps.length} response${rsvps.length !== 1 ? "s" : ""}`
-                : "Loading..."}
-            </p>
+          <div className="px-6 py-5 border-b border-sage/10 flex items-center justify-between">
+            <div>
+              <h2 className="font-display text-2xl font-[300] text-foreground">
+                Guest RSVPs
+              </h2>
+              <p className="font-sans text-sm text-muted-foreground mt-0.5">
+                {rsvps
+                  ? `${rsvps.length} response${rsvps.length !== 1 ? "s" : ""}`
+                  : "Loading..."}
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              data-ocid="admin.rsvp.refresh_button"
+              onClick={() => refetchRSVPs()}
+              disabled={rsvpsFetching}
+              className="border-sage/30 text-sage-dark hover:bg-sage/10 font-sans rounded-full gap-2"
+            >
+              <RefreshCw
+                className={`w-4 h-4 ${rsvpsFetching ? "animate-spin" : ""}`}
+              />
+              Refresh
+            </Button>
           </div>
 
           <div className="overflow-x-auto">
