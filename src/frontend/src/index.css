@@ -1,0 +1,165 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Fonts ──────────────────────────────────────────────── */
+@font-face {
+  font-family: "Fraunces";
+  src: url("/assets/fonts/Fraunces.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Instrument Serif";
+  src: url("/assets/fonts/InstrumentSerif.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Crimson Pro";
+  src: url("/assets/fonts/CrimsonPro.woff2") format("woff2");
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Figtree";
+  src: url("/assets/fonts/Figtree.woff2") format("woff2");
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ─── Design Tokens ──────────────────────────────────────── */
+@layer base {
+  :root {
+    --radius: 0.5rem;
+
+    /* Wedding palette:
+       sage green  = oklch(0.87 0.04 130)  → #d6ddb9 (user-requested)
+       cream/ivory = oklch(0.98 0.012 90)  → lighter cream
+       sunflower   = oklch(0.82 0.18 85)   → #F5C842-ish
+       dark sage   = oklch(0.55 0.06 130)
+       warm brown  = oklch(0.4 0.05 60)
+    */
+
+    /* Semantic tokens */
+    --background: 0.98 0.012 90;
+    --foreground: 0.28 0.04 60;
+
+    --card: 0.99 0.006 80;
+    --card-foreground: 0.28 0.04 60;
+
+    --popover: 0.99 0.006 80;
+    --popover-foreground: 0.28 0.04 60;
+
+    --primary: 0.55 0.06 130;
+    --primary-foreground: 0.98 0.01 80;
+
+    --secondary: 0.92 0.03 90;
+    --secondary-foreground: 0.55 0.06 130;
+
+    --muted: 0.93 0.02 85;
+    --muted-foreground: 0.5 0.04 70;
+
+    --accent: 0.82 0.18 85;
+    --accent-foreground: 0.28 0.04 60;
+
+    --destructive: 0.577 0.245 27.325;
+    --destructive-foreground: 0.985 0 0;
+
+    --border: 0.87 0.04 100;
+    --input: 0.87 0.04 100;
+    --ring: 0.55 0.06 130;
+
+    /* Wedding custom tokens */
+    --sage: 0.87 0.04 130;
+    --sage-light: 0.92 0.03 130;
+    --sage-dark: 0.55 0.06 130;
+    --cream: 0.98 0.012 90;
+    --cream-dark: 0.93 0.02 85;
+    --sunflower: 0.82 0.18 85;
+    --sunflower-dark: 0.72 0.18 75;
+    --warm-brown: 0.4 0.05 60;
+    --blush: 0.88 0.05 20;
+
+    /* Chart tokens */
+    --chart-1: 0.55 0.06 130;
+    --chart-2: 0.82 0.18 85;
+    --chart-3: 0.88 0.05 20;
+    --chart-4: 0.87 0.04 130;
+    --chart-5: 0.72 0.18 75;
+
+    /* Sidebar */
+    --sidebar: 0.98 0.012 90;
+    --sidebar-foreground: 0.28 0.04 60;
+    --sidebar-primary: 0.55 0.06 130;
+    --sidebar-primary-foreground: 0.98 0.01 80;
+    --sidebar-accent: 0.92 0.03 90;
+    --sidebar-accent-foreground: 0.55 0.06 130;
+    --sidebar-border: 0.87 0.04 100;
+    --sidebar-ring: 0.55 0.06 130;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Figtree", sans-serif;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: "Fraunces", serif;
+  }
+}
+
+/* ─── Global Utilities ───────────────────────────────────── */
+.font-display {
+  font-family: "Fraunces", serif;
+}
+
+.font-script {
+  font-family: "Instrument Serif", serif;
+}
+
+.font-body-serif {
+  font-family: "Crimson Pro", serif;
+}
+
+/* Subtle noise texture overlay */
+.noise-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Petal scatter decorative element */
+.petal-scatter {
+  background-image: radial-gradient(
+      circle at 20% 80%,
+      oklch(var(--sage-light) / 0.3) 0%,
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 80% 20%,
+      oklch(var(--sunflower) / 0.15) 0%,
+      transparent 25%
+    ),
+    radial-gradient(
+      circle at 60% 70%,
+      oklch(var(--blush) / 0.2) 0%,
+      transparent 20%
+    );
+}

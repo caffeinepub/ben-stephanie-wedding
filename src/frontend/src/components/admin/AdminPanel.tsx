@@ -20,10 +20,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Loader2, LogOut, Trash2 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { Loader2, LogOut, RefreshCw, Trash2 } from "lucide-react";
 import { motion } from "motion/react";
+import { useState } from "react";
 import { toast } from "sonner";
-import { useAdminDeleteRSVP, useAdminRSVPs } from "../../hooks/useAdminQueries";
+import {
+  ADMIN_RSVPS_KEY,
+  useAdminDeleteRSVP,
+  useAdminRSVPs,
+} from "../../hooks/useAdminQueries";
 
 interface AdminPanelProps {
   onLogout?: () => void;
@@ -32,6 +38,14 @@ interface AdminPanelProps {
 export function AdminPanel({ onLogout }: AdminPanelProps) {
   const { data: rsvps, isLoading: rsvpsLoading } = useAdminRSVPs();
   const { mutate: deleteRSVP, isPending: deletingId } = useAdminDeleteRSVP();
+  const queryClient = useQueryClient();
+  const [refreshing, setRefreshing] = useState(false);
+
+  async function handleRefresh() {
+    setRefreshing(true);
+    await queryClient.invalidateQueries({ queryKey: ADMIN_RSVPS_KEY });
+    setRefreshing(false);
+  }
 
   function formatDate(submittedAt: bigint) {
     const ms = Number(submittedAt) / 1_000_000;
@@ -77,15 +91,29 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
           transition={{ duration: 0.5 }}
           className="bg-white/80 backdrop-blur-sm border border-sage/20 rounded-2xl overflow-hidden shadow-card"
         >
-          <div className="px-6 py-5 border-b border-sage/10">
-            <h2 className="font-display text-2xl font-[300] text-foreground">
-              Guest RSVPs
-            </h2>
-            <p className="font-sans text-sm text-muted-foreground mt-0.5">
-              {rsvps
-                ? `${rsvps.length} response${rsvps.length !== 1 ? "s" : ""}`
-                : "Loading..."}
-            </p>
+          <div className="px-6 py-5 border-b border-sage/10 flex items-center justify-between">
+            <div>
+              <h2 className="font-display text-2xl font-[300] text-foreground">
+                Guest RSVPs
+              </h2>
+              <p className="font-sans text-sm text-muted-foreground mt-0.5">
+                {rsvps
+                  ? `${rsvps.length} response${rsvps.length !== 1 ? "s" : ""}`
+                  : "Loading..."}
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              data-ocid="admin.rsvp.secondary_button"
+              onClick={handleRefresh}
+              disabled={refreshing || rsvpsLoading}
+              className="border-sage/30 text-sage-dark hover:bg-sage/10 font-sans rounded-full gap-2"
+            >
+              <RefreshCw
+                className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`}
+              />
+              Refresh
+            </Button>
           </div>
 
           <div className="overflow-x-auto">

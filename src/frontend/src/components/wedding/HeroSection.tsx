@@ -1,5 +1,8 @@
 import { Heart } from "lucide-react";
 import { motion } from "motion/react";
+import botanicalDivider from "../../../public/assets/generated/botanical-divider-transparent.dim_800x150.png";
+import heroFlowers from "../../../public/assets/generated/wedding-hero-flowers.dim_1600x900.jpg";
+import couplePhoto from "../../../public/assets/uploads/download-1.webp";
 
 export function HeroSection() {
   return (
@@ -18,7 +21,7 @@ export function HeroSection() {
       {/* Hero background image */}
       <div className="absolute inset-0 overflow-hidden">
         <img
-          src="/assets/generated/wedding-hero-flowers.dim_1600x900.jpg"
+          src={heroFlowers}
           alt="Wedding garden"
           className="w-full h-full object-cover opacity-30"
           loading="eager"
@@ -86,7 +89,7 @@ export function HeroSection() {
           />
           <div className="w-56 h-56 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-white/80 shadow-[0_0_0_8px_oklch(0.87_0.04_130/0.25),0_8px_40px_oklch(0.28_0.04_60/0.2)]">
             <img
-              src="/assets/uploads/0-1.jpg"
+              src={couplePhoto}
               alt="Ben and Stephanie"
               className="w-full h-full object-cover"
             />
@@ -155,7 +158,7 @@ export function HeroSection() {
       {/* Bottom decorative divider */}
       <div className="absolute bottom-0 left-0 right-0">
         <img
-          src="/assets/generated/botanical-divider-transparent.dim_800x150.png"
+          src={botanicalDivider}
           alt=""
           className="w-full h-24 object-cover object-top opacity-60"
           aria-hidden="true"

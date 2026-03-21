@@ -1,47 +1,34 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { RSVP } from "../backend.d";
-import { useAdminActor } from "./useAdminActor";
+import { createActorWithConfig } from "../config";
 
-/**
- * Fetches all RSVPs using the admin-privileged actor.
- * getAllRSVPs is restricted to admin callers on the backend, so we must use
- * the actor that has been initialized with the Caffeine admin token.
- */
+const ADMIN_PASSCODE = "3762";
+export const ADMIN_RSVPS_KEY = ["adminRSVPs"];
+
 export function useAdminRSVPs() {
-  const { adminActor, isLoading: actorLoading } = useAdminActor();
-
-  const query = useQuery<RSVP[]>({
-    queryKey: ["adminRSVPs"],
+  return useQuery<RSVP[]>({
+    queryKey: ADMIN_RSVPS_KEY,
     queryFn: async () => {
-      if (!adminActor) throw new Error("Admin actor not ready");
-      return adminActor.getAllRSVPs();
+      const actor = await createActorWithConfig();
+      const result = await (actor as any).getAllRSVPs(ADMIN_PASSCODE);
+      return result;
     },
-    enabled: !!adminActor,
+    staleTime: 0,
     retry: 3,
     retryDelay: 1500,
   });
-
-  return {
-    ...query,
-    // Show loading while the actor itself is still initializing
-    isLoading: actorLoading || query.isLoading,
-  };
 }
 
-/**
- * Deletes an RSVP by ID using the admin-privileged actor.
- */
 export function useAdminDeleteRSVP() {
-  const { adminActor } = useAdminActor();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (id: bigint) => {
-      if (!adminActor) throw new Error("Admin actor not ready");
-      await adminActor.deleteRSVP(id);
+      const actor = await createActorWithConfig();
+      await (actor as any).deleteRSVP(id, ADMIN_PASSCODE);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["adminRSVPs"] });
+      queryClient.invalidateQueries({ queryKey: ADMIN_RSVPS_KEY });
     },
   });
 }
