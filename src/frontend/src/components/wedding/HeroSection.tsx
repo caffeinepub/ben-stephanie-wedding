@@ -1,7 +1,7 @@
 import { Heart } from "lucide-react";
 import { motion } from "motion/react";
 
-const couplePhoto = "/assets/uploads/download-1.webp";
+const couplePhoto = "/assets/uploads/0-1-1.jpg";
 const heroFlowers = "/assets/generated/wedding-hero-flowers.dim_1600x900.jpg";
 const botanicalDivider =
   "/assets/generated/botanical-divider-transparent.dim_800x150.png";
