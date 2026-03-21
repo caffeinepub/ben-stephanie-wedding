@@ -1,8 +1,10 @@
 import { Heart } from "lucide-react";
 import { motion } from "motion/react";
-import botanicalDivider from "../../assets/botanical-divider.png";
-import couplePhoto from "../../assets/couple-photo.webp";
-import heroFlowers from "../../assets/wedding-hero-flowers.jpg";
+
+const couplePhoto = "/assets/uploads/download-1.webp";
+const heroFlowers = "/assets/generated/wedding-hero-flowers.dim_1600x900.jpg";
+const botanicalDivider =
+  "/assets/generated/botanical-divider-transparent.dim_800x150.png";
 
 export function HeroSection() {
   return (
