@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { RSVP } from "../backend.d";
 import { createActorWithConfig } from "../config";
 
-const ADMIN_PASSCODE = "3762";
 export const ADMIN_RSVPS_KEY = ["adminRSVPs"];
 
 export function useAdminRSVPs() {
@@ -10,12 +9,12 @@ export function useAdminRSVPs() {
     queryKey: ADMIN_RSVPS_KEY,
     queryFn: async () => {
       const actor = await createActorWithConfig();
-      const result = await (actor as any).getAllRSVPs(ADMIN_PASSCODE);
+      const result = await actor.getAllRSVPs();
       return result;
     },
     staleTime: 0,
-    retry: 3,
-    retryDelay: 1500,
+    retry: 1,
+    retryDelay: 1000,
   });
 }
 
@@ -25,7 +24,7 @@ export function useAdminDeleteRSVP() {
   return useMutation({
     mutationFn: async (id: bigint) => {
       const actor = await createActorWithConfig();
-      await (actor as any).deleteRSVP(id, ADMIN_PASSCODE);
+      await actor.deleteRSVP(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ADMIN_RSVPS_KEY });

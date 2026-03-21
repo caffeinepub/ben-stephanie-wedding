@@ -24,8 +24,8 @@ export interface RSVP {
     partySize: bigint;
 }
 export interface backendInterface {
-    deleteRSVP(id: bigint, passcode: string): Promise<void>;
-    getAllRSVPs(passcode: string): Promise<Array<RSVP>>;
+    deleteRSVP(id: bigint): Promise<void>;
+    getAllRSVPs(): Promise<Array<RSVP>>;
     getWeddingDetails(): Promise<WeddingDetails>;
     submitRSVP(guestName: string, partySize: bigint, attending: boolean, mealPreference: string, message: string): Promise<bigint>;
 }

@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
-import { Loader2, LogOut, RefreshCw, Trash2 } from "lucide-react";
+import { AlertCircle, Loader2, LogOut, RefreshCw, Trash2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -28,7 +28,12 @@ interface AdminPanelProps {
 }
 
 export function AdminPanel({ onLogout }: AdminPanelProps) {
-  const { data: rsvps, isLoading: rsvpsLoading } = useAdminRSVPs();
+  const {
+    data: rsvps,
+    isLoading: rsvpsLoading,
+    isError,
+    error,
+  } = useAdminRSVPs();
   const { mutate: deleteRSVP, isPending: deletingId } = useAdminDeleteRSVP();
   const queryClient = useQueryClient();
   const [refreshing, setRefreshing] = useState(false);
@@ -49,6 +54,12 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
   }
 
   const rsvpList = rsvps ?? [];
+
+  function getSubtitle() {
+    if (rsvpsLoading) return "Loading...";
+    if (isError) return "Could not load responses";
+    return `${rsvpList.length} response${rsvpList.length !== 1 ? "s" : ""}`;
+  }
 
   return (
     <div
@@ -91,9 +102,7 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
                 Guest RSVPs
               </h2>
               <p className="font-sans text-sm text-muted-foreground mt-0.5">
-                {rsvpsLoading
-                  ? "Loading..."
-                  : `${rsvpList.length} response${rsvpList.length !== 1 ? "s" : ""}`}
+                {getSubtitle()}
               </p>
             </div>
             <Button
@@ -128,8 +137,34 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
             </div>
           )}
 
+          {/* Error state */}
+          {!rsvpsLoading && isError && (
+            <div
+              data-ocid="admin.rsvp.error_state"
+              className="bg-white/80 border border-red-200 rounded-2xl p-10 text-center shadow-sm"
+            >
+              <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-3" />
+              <p className="font-sans text-sm font-semibold text-red-600 mb-1">
+                Failed to load RSVPs
+              </p>
+              <p className="font-sans text-xs text-muted-foreground mb-4">
+                {error instanceof Error
+                  ? error.message
+                  : "An unexpected error occurred. Please try refreshing."}
+              </p>
+              <Button
+                variant="outline"
+                onClick={handleRefresh}
+                className="border-sage/30 text-sage-dark hover:bg-sage/10 font-sans rounded-full gap-2 text-sm"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                Try Again
+              </Button>
+            </div>
+          )}
+
           {/* Empty state */}
-          {!rsvpsLoading && rsvpList.length === 0 && (
+          {!rsvpsLoading && !isError && rsvpList.length === 0 && (
             <div
               data-ocid="admin.rsvp.empty_state"
               className="bg-white/80 border border-sage/20 rounded-2xl p-16 text-center shadow-sm"
@@ -141,7 +176,7 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
           )}
 
           {/* Card grid */}
-          {!rsvpsLoading && rsvpList.length > 0 && (
+          {!rsvpsLoading && !isError && rsvpList.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <AnimatePresence>
                 {rsvpList.map((rsvp, idx) => (

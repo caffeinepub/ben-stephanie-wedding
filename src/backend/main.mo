@@ -1,14 +1,11 @@
 import Array "mo:base/Array";
 import Time "mo:core/Time";
-import Runtime "mo:core/Runtime";
 import AccessControl "authorization/access-control";
 import MixinStorage "blob-storage/Mixin";
 import Principal "mo:core/Principal";
 import Map "mo:core/Map";
 
 actor {
-  let ADMIN_PASSCODE = "3762";
-
   type WeddingDetails = {
     date : Text;
     time : Text;
@@ -36,7 +33,8 @@ actor {
   let accessControlState = AccessControl.initState();
   let userProfiles = Map.empty<Principal, UserProfile>();
 
-  // Kept for upgrade compatibility with previous version (do not remove)
+  // Kept for upgrade compatibility with previous versions (do not remove)
+  stable let ADMIN_PASSCODE = "3762";
   stable let rsvps = Map.empty<Nat, RSVP>();
 
   stable var nextRSVPId : Nat = 1;
@@ -70,17 +68,11 @@ actor {
     currentId;
   };
 
-  public query func getAllRSVPs(passcode : Text) : async [RSVP] {
-    if (passcode != ADMIN_PASSCODE) {
-      Runtime.trap("Unauthorized: Invalid passcode");
-    };
+  public query func getAllRSVPs() : async [RSVP] {
     rsvpList;
   };
 
-  public shared func deleteRSVP(id : Nat, passcode : Text) : async () {
-    if (passcode != ADMIN_PASSCODE) {
-      Runtime.trap("Unauthorized: Invalid passcode");
-    };
+  public shared func deleteRSVP(id : Nat) : async () {
     rsvpList := Array.filter<RSVP>(rsvpList, func(r : RSVP) : Bool { r.id != id });
   };
 };
