@@ -1,7 +1,7 @@
 # Ben & Stephanie Wedding
 
 ## Current State
-The backend stores RSVPs in a non-stable Map (`let rsvps = Map.empty<Nat, RSVP>()`), which means all RSVP data is wiped every time the canister is redeployed. The `nextRSVPId` counter is also non-stable. Images are imported as static assets and files exist in the project.
+Backend uses `stable let rsvps = Map.empty<Nat, RSVP>()` which is not stable-compatible, causing data loss on every deployment. Admin panel subtitle shows "Loading..." permanently when the backend query fails, because the subtitle checks `rsvps ? count : "Loading..."` but `rsvps` stays `undefined` on error.
 
 ## Requested Changes (Diff)
 
@@ -9,12 +9,13 @@ The backend stores RSVPs in a non-stable Map (`let rsvps = Map.empty<Nat, RSVP>(
 - Nothing new
 
 ### Modify
-- Make `rsvps` map and `nextRSVPId` counter stable so data persists across deployments
+- Backend: replace `Map`-based RSVP storage with a `stable var` array so data persists across deployments
+- AdminPanel.tsx: fix subtitle to show "0 responses" (or nothing) instead of "Loading..." when query has finished but returned no data
 
 ### Remove
-- Nothing
+- `Map` import and usage for RSVP storage
 
 ## Implementation Plan
-1. Change `var nextRSVPId = 1` to `stable var nextRSVPId = 1`
-2. Change `let rsvps = Map.empty<Nat, RSVP>()` to `stable let rsvps = Map.empty<Nat, RSVP>()`
-3. No frontend changes needed
+1. Rewrite backend RSVP storage to use `stable var rsvpList : [RSVP] = []` with Array-based add/remove
+2. Update `submitRSVP`, `getAllRSVPs`, `deleteRSVP` to work with the array
+3. Fix AdminPanel.tsx subtitle: use `isLoading` state instead of truthiness of `rsvps` to determine loading text
