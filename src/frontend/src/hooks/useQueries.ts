@@ -22,28 +22,7 @@ export function useWeddingDetails() {
       }
       return actor.getWeddingDetails();
     },
-    // Run as soon as we have an actor; no need to wait on isFetching
     enabled: !!actor,
-  });
-}
-
-export function useUpdateWeddingDetails() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (details: WeddingDetails) => {
-      if (!actor) throw new Error("Not authenticated");
-      await actor.updateWeddingDetails(
-        details.date,
-        details.time,
-        details.venue,
-        details.address,
-        details.description,
-      );
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["weddingDetails"] });
-    },
   });
 }
 
@@ -57,6 +36,7 @@ export function useAllRSVPs() {
       if (!actor) return [];
       return actor.getAllRSVPs();
     },
+    enabled: !!actor,
   });
 }
 
@@ -99,19 +79,5 @@ export function useDeleteRSVP() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["allRSVPs"] });
     },
-  });
-}
-
-// ─── Admin ───────────────────────────────────────────────────────────────────
-
-export function useIsAdmin() {
-  const { actor } = useActor();
-  return useQuery<boolean>({
-    queryKey: ["isAdmin"],
-    queryFn: async () => {
-      if (!actor) return false;
-      return actor.isCallerAdmin();
-    },
-    enabled: !!actor,
   });
 }

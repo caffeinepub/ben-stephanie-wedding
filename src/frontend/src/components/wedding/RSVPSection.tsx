@@ -11,6 +11,7 @@ import { useSubmitRSVP } from "../../hooks/useQueries";
 
 export function RSVPSection() {
   const [partySize, setPartySize] = useState(1);
+  const [partySizeInput, setPartySizeInput] = useState("1");
   const [guestNames, setGuestNames] = useState<string[]>([""]);
   const [attending, setAttending] = useState<"yes" | "no" | "">("");
   const [message, setMessage] = useState("");
@@ -63,6 +64,7 @@ export function RSVPSection() {
   function resetForm() {
     setSubmitted(false);
     setPartySize(1);
+    setPartySizeInput("1");
     setGuestNames([""]);
     setAttending("");
     setMessage("");
@@ -206,12 +208,16 @@ export function RSVPSection() {
                     type="number"
                     min={1}
                     max={10}
-                    value={partySize}
-                    onChange={(e) =>
-                      setPartySize(
-                        Math.max(1, Math.min(10, Number(e.target.value))),
-                      )
-                    }
+                    value={partySizeInput}
+                    onChange={(e) => setPartySizeInput(e.target.value)}
+                    onBlur={() => {
+                      const parsed = Number.parseInt(partySizeInput, 10);
+                      const clamped = Number.isNaN(parsed)
+                        ? 1
+                        : Math.max(1, Math.min(10, parsed));
+                      setPartySize(clamped);
+                      setPartySizeInput(String(clamped));
+                    }}
                     className="border-sage/30 focus-visible:ring-sage bg-white/60 rounded-xl h-12 font-sans text-base w-32"
                   />
                 </div>
